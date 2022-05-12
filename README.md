@@ -24,6 +24,7 @@ runes.run_spec(runes.spec{
 
   runes.test{"`my.plugin.add` adds correctly",
     test = function(assert, state)
+      -- Adding context to the assertion is optional
       assert.eq['Adding one should work correctly'](my_plugin.add(state.my_base_number, 1), 1338)
     end},
 
