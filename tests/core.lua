@@ -24,7 +24,7 @@ local setup_spec = runes.spec{
   end,
 
   -- named keys are added first to the test
-  _ignored_test = function(assert)
+  _ignored_test = function()
     assert.fail['this should never be called']()
   end,
 
@@ -42,13 +42,13 @@ local setup_spec = runes.spec{
   },
 
   runes.test{"ensure test setup works",
-    test = function(assert, state)
-      assert.gt['should have run at least once before this test'](state.test_setup_times_called, 0)
+    test = function()
+      assert.gt['should have run at least once before this test'](test_setup_times_called, 0)
     end,
   },
   runes.test{"ensure test setup ran twice -- ignoring the previous tests",
-    test = function(assert, state)
-    assert.eq["this should be the last, then `test_setup` should've been called only twice"](state.test_setup_times_called, 2)
+    test = function()
+    assert.eq["this should be the last, then `test_setup` should've been called only twice"](test_setup_times_called, 2)
   end
   }
 }

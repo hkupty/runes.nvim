@@ -14,6 +14,11 @@ end
 
 test.run_case = function(state)
   state.phase = "case"
+  local env = { assert = state.assert, state = state.state }
+  if type(state.state) == "table" then
+    env = vim.tbl_extend("keep", env, state.state)
+  end
+  setfenv(state.test, vim.tbl_extend('force', getfenv(), env))
   local success, err = pcall(state.test, state.assert, state.state)
 
   return success, state, err
@@ -21,6 +26,11 @@ end
 
 test.teardown = function(state)
   state.phase = "teardown"
+  local env = { assert = state.assert, state = state.state }
+  if type(state.state) == "table" then
+    env = vim.tbl_extend("keep", env, state.state)
+  end
+  setfenv(state.test, vim.tbl_extend('force', getfenv(), env))
   local success, err = pcall(state.teardown, state.state, state.assert)
 
   return success, state, err
