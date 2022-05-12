@@ -23,27 +23,27 @@ runes.run_spec(runes.spec{
   spec_setup = function() return { my_base_number = 1337 },
 
   runes.test{"`my.plugin.add` adds correctly",
-  test = function(assert, state)
-    assert.eq['Adding one should work correctly'](my_plugin.add(state.my_base_number, 1), 1338)
-  end},
+    test = function(assert, state)
+      assert.eq['Adding one should work correctly'](my_plugin.add(state.my_base_number, 1), 1338)
+    end},
 
   runes.test{"`my.plugin.mod` returns the right remaining/modulo",
-  labels = {"skip"}, -- This test is wrong, so I want to skip it for now and fix later
-  test = function(assert, state)
-    assert.odd['Modulo should be 1'](my_plugin.mod(state.my_base_number, 2))
-  end},
+    labels = {"skip"}, -- This test is wrong, so I want to skip it for now and fix later
+    test = function(assert, state)
+      assert.odd['Modulo should be 1'](my_plugin.mod(state.my_base_number, 2))
+    end},
 
   runes.test{"`my.plugin.awsome` does some great computation correctly",
-  labels = {"skip"}, -- This test is flaky, so I want to skip it for now
-  setup = function(state)
-    state.base_for_computation = math.random(state.my_base_number)
-    return state
-  end,
-  test = function(assert, state)
-    local result = my_plugin.awesome(state.base_for_computation)
-    assert.not_nil['awesome should return a non-nil value'](result)
-    assert.is_table['awesome should return a valid table'](result)
-  end},
+    labels = {"skip"}, -- This test is flaky, so I want to skip it for now
+    setup = function(state)
+      state.base_for_computation = math.random(state.my_base_number)
+      return state
+    end,
+    test = function(assert, state)
+      local result = my_plugin.awesome(state.base_for_computation)
+      assert.not_nil['awesome should return a non-nil value'](result)
+      assert.is_table['awesome should return a valid table'](result)
+    end},
 
 
   runes.test{"_ this test is skipped as well because it starts with an `_`",
