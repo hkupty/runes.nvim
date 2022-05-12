@@ -58,7 +58,7 @@ runes.run_spec(runes.spec{
 
 ## Why?
 
-I create this plugin to be able to properly test [iron.nvim](https://github.com/hkupty/iron.nvim).
+I created this plugin to be able to properly test [iron.nvim](https://github.com/hkupty/iron.nvim).
 Using [busted](http://olivinelabs.com/busted/) is good but I felt I wasn't really testing it because I was mocking away `vim.*`.
 Instead of bringing `vim.*` to busted, I decided to write a test framework that embraces it.
 
