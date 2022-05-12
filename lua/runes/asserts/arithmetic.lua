@@ -40,4 +40,21 @@ arithmetic.lt = function(a, b)
   end
 end
 
+arithmetic.even = function(a)
+  if a % 2 == 0 then
+    return true, nil
+  else
+    return false, tostring(a) .. " is not even"
+  end
+end
+
+arithmetic.odd = function(a)
+  if a % 2 == 1 then
+    return true, nil
+  else
+    return false, tostring(a) .. " is not odd"
+  end
+end
+
+
 return arithmetic
