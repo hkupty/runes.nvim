@@ -87,13 +87,12 @@ spec.run_spec = function(test_spec)
   config.collect(results, test_spec)
 end
 
-spec.assoc_case = function(tbl, data, descr)
+spec.assoc_case = function(tbl, data)
     local data_type = type(data)
     if data_type == "function" then
-      data = test.new_case{description = descr, test = data}
+      data = test.new_case{description = ("test-case-" .. #tbl.cases), test = data}
     elseif data_type == "table" then
-      -- ensure all test cases have a description
-      data.description = data.description or descr or ("test-case-" .. tostring(math.random(200)))
+      data.description = data.description or ("test-case-" .. #tbl.cases)
     else
       error("A test case has to be either a table or a function. Using `runes.test.new_case` is recommendded.", 2)
     end
@@ -112,7 +111,7 @@ spec.new_spec = function(spec_as_table)
       if special_keys[descr] then
         tbl.meta[descr] = data
       else
-        spec.assoc_case(tbl, data, descr)
+        error("'" .. descr .. "' is not a configuration key", 2)
       end
     end
   end
