@@ -7,6 +7,7 @@ local spec = {}
 local special_keys = {
   -- Test configuration
   config = true,
+  labels = true,
   description = true,
 
   -- Spec-related
@@ -25,40 +26,73 @@ local default_config = {
   skip_tests = skip.apply_all_rules
 }
 
-spec.run_spec = function(test_spec)
-  local config = vim.tbl_deep_extend("keep", test_spec.meta.config or {}, default_config)
-  local spec_setup = test_spec.meta.spec_setup or function() return {} end
-  local test_setup = test_spec.meta.test_setup or identity
-  local test_teardown = test_spec.meta.test_teardown or identity
-  local spec_teardown = test_spec.meta.spec_setup or identity
+spec.spec_state = function(meta)
+  local spec_setup = meta.spec_setup or function() return {} end
+  local test_setup
+  local test_teardown
+  local spec_teardown
 
-  -- If state is immutable, initial state is copied to all the tests
-  -- However, if the state needs to be mutated, is is passed through
-  local state_pass_fn = config.immutable_state and vim.deepcopy or identity
-
-  local spec_data = spec_setup()
-
-  local run_test = function(case)
-    local state = test.run(case, test_setup(state_pass_fn(spec_data)))
-    return test_teardown(state) or state -- ensure we always return the state, even if the teardown messes up
+  if meta.test_setup ~= nil then
+    if meta.config.immutable_state then
+      test_setup = function(base_state)
+        return meta.test_setup(vim.deepcopy(base_state))
+      end
+    else
+      test_setup = meta.test_setup
+    end
+  else
+    test_setup = identity
   end
 
-  -- TODO allow configuring filter
+  if meta.test_teardown ~= nil then
+    test_teardown = function(test_state)
+      return meta.test_teardown(test_state) or test_state
+    end
+  else
+    test_teardown = identity
+  end
+
+  if meta.spec_teardown ~= nil then
+    spec_teardown = function(base_state)
+      return meta.spec_teardown(base_state) or base_state
+    end
+  else
+    spec_teardown = identity
+  end
+
+  return {
+    base_state = spec_setup(),
+    test_setup = test_setup,
+    test_teardown = test_teardown,
+    spec_teardown = spec_setup
+  }
+
+end
+
+spec.run_spec = function(test_spec)
+  test_spec.meta.config = vim.tbl_deep_extend("keep", test_spec.meta.config or {}, default_config)
+  local config = test_spec.meta.config -- aliasing
+  local spec_state = spec.spec_state(test_spec.meta)
+
+  local run_test = function(case)
+    local state = test.run(case, spec_state.test_setup(spec_state.base_state))
+    return spec_state.test_teardown(state)
+  end
+
   local results = vim.tbl_map(run_test, vim.tbl_filter(config.skip_tests, test_spec.cases))
 
-  spec_teardown(spec_data)
+  spec_state.spec_teardown(spec_state.base_state)
 
   -- TODO move outside, this should just return
   config.collect(results, test_spec)
 end
 
-spec.assoc_case = function(tbl, data, descr)
+spec.assoc_case = function(tbl, data)
     local data_type = type(data)
     if data_type == "function" then
-      data = test.new_case{description = descr, test = data}
+      data = test.new_case{description = ("test-case-" .. #tbl.cases), test = data}
     elseif data_type == "table" then
-      -- ensure all test cases have a description
-      data.description = data.description or descr or ("test-case-" .. tostring(math.random(200)))
+      data.description = data.description or ("test-case-" .. #tbl.cases)
     else
       error("A test case has to be either a table or a function. Using `runes.test.new_case` is recommendded.", 2)
     end
@@ -77,7 +111,7 @@ spec.new_spec = function(spec_as_table)
       if special_keys[descr] then
         tbl.meta[descr] = data
       else
-        spec.assoc_case(tbl, data, descr)
+        error("'" .. descr .. "' is not a configuration key", 2)
       end
     end
   end

@@ -23,11 +23,6 @@ local setup_spec = runes.spec{
     return state
   end,
 
-  -- named keys are added first to the test
-  _ignored_test = function()
-    assert.fail['this should never be called']()
-  end,
-
   runes.test{"_ this test is ignored",
     test = function(assert)
       assert.fail['this should never be called']()
