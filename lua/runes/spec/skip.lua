@@ -10,6 +10,8 @@ end
 
 skip.apply_all_rules = function(case)
   for rule_name, rule in pairs(skip) do
+
+    -- ignore itself to avoid recursion
     if rule_name ~= "apply_all_rules" then
       if not rule(case) then
         return false
