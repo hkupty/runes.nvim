@@ -7,6 +7,7 @@ local spec = {}
 local special_keys = {
   -- Test configuration
   config = true,
+  labels = true,
   description = true,
 
   -- Spec-related
