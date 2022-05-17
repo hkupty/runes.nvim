@@ -84,7 +84,7 @@ spec.run_spec = function(test_spec)
   spec_state.spec_teardown(spec_state.base_state)
 
   -- TODO move outside, this should just return
-  config.collect(results, test_spec)
+  config.collect(test_spec, results)
 end
 
 spec.assoc_case = function(tbl, data)
