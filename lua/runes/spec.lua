@@ -76,7 +76,10 @@ spec.run_spec = function(test_spec)
 
   local run_test = function(case)
     local state = test.run(case, spec_state.test_setup(spec_state.base_state))
-    return spec_state.test_teardown(state)
+    -- TODO Use same logic as in the teardown stage in `runes.test`
+    spec_state.test_teardown(state.state)
+
+    return state
   end
 
   local results = vim.tbl_map(run_test, vim.tbl_filter(config.skip_tests, test_spec.cases))
@@ -84,7 +87,7 @@ spec.run_spec = function(test_spec)
   spec_state.spec_teardown(spec_state.base_state)
 
   -- TODO move outside, this should just return
-  config.collect(results, test_spec)
+  config.collect(test_spec, results)
 end
 
 spec.assoc_case = function(tbl, data)
